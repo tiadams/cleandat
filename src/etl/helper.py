@@ -1,7 +1,7 @@
-import constants
+from etl import constants
 
 
-def get_encoding(string):
+def get_encoding(string: str) -> (int, str):
     """ Checks whether a string could be meant as documentation for an encoding.
 
     Encoding may be divided by a combination of whitespaces and/or delimiters, e.g. for male/female encoding
@@ -14,11 +14,14 @@ def get_encoding(string):
     if any(delimiter in string for delimiter in possible_delimiters):
         for delimiter in possible_delimiters:
             if delimiter in string:
-                key, value = string.split(delimiter)
+                try:
+                    key, value = string.split(delimiter)
+                except ValueError:
+                    return None
                 # remove trailing and leading whitespaces
                 key = key.strip()
                 value = value.strip()
-                if key.isnumeric() and value.isalpha():
-                    return key, value
+                if key.isnumeric() and isinstance(value, str):
+                    return int(key), value
     else:
         return None
