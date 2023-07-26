@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from src.etl.helper import get_encoding
+from etl import get_encoding
 
 
 class Test(TestCase):
