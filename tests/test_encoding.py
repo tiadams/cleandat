@@ -1,3 +1,4 @@
+import os
 from unittest import TestCase
 
 import pandas as pd
@@ -7,7 +8,10 @@ from clinical_etl_toolbox.encoding import get_encoding, identify_descriptive_hea
 
 
 class Test(TestCase):
-    df = pd.read_csv('resources/test.csv')
+
+    TEST_DIR_PATH = os.path.dirname(os.path.realpath(__file__))
+
+    df = pd.read_csv(os.path.join(TEST_DIR_PATH, "resources", 'test.csv'))
 
     def test_get_encoding_return_encoding(self):
         case1 = '1=m'
