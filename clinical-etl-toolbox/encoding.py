@@ -2,7 +2,33 @@ import numpy as np
 import pandas as pd
 from pandas import DataFrame
 
-from etl.helper import get_encoding
+import constants
+
+
+def get_encoding(string: str) -> (str, int):
+    """ Checks whether a string could be meant as documentation for an encoding.
+
+    Encoding may be divided by a combination of whitespaces and/or delimiters, e.g. for male/female encoding
+    1=m, 1->m, 1 - m, 1 : m.
+
+    :param string: The string that should be checked
+    :return: The assumed key and value of the encoding, if the string is a code string, else None
+    """
+    possible_delimiters = constants.DELIMITERS
+    if any(delimiter in string for delimiter in possible_delimiters):
+        for delimiter in possible_delimiters:
+            if delimiter in string:
+                try:
+                    key, value = string.split(delimiter)
+                except ValueError:
+                    return None
+                # remove trailing and leading whitespaces
+                key = key.strip()
+                value = value.strip()
+                if key.isnumeric() and isinstance(value, str):
+                    return value, int(key)
+    else:
+        return None
 
 
 def identify_descriptive_header_cells(df: DataFrame) -> DataFrame:
@@ -16,7 +42,6 @@ def identify_descriptive_header_cells(df: DataFrame) -> DataFrame:
     :param df: The dataframe to be analyzed
     :return: boolean matrix with the same dimensions as the dataframe, where True indicates a descriptive header cell
     """
-    possible_delimiters = [':', '=', '-', '->', '_']
     is_header_matrix = pd.DataFrame(False, index=df.index, columns=df.columns)
     for column in df:
         for row_idx, entry in enumerate(df[column]):
@@ -24,51 +49,13 @@ def identify_descriptive_header_cells(df: DataFrame) -> DataFrame:
             if pd.isnull(entry):
                 is_header_matrix.at[row_idx, column] = np.nan
                 continue
-            code_idx = None
-            contains_number = False
-            contains_string = False
-            # second case: entries are only separated by whitespaces (and contain no delimiter)
-            if ' ' in str(entry) and not any(delimiter in str(entry) for delimiter in possible_delimiters):
-                for part in str(entry).split():
-                    if part.isnumeric():
-                        contains_number = True
-                    else:
-                        contains_string = True
-                # code is (most likely) the first number in the entry
-                if contains_string and contains_number:
-                    code_idx = [x for x in str(entry).split() if x.isnumeric()][0]
-            # third case: entries are separated by a delimiter, no whitespaces inbetween
-            elif any(delimiter in str(entry) for delimiter in possible_delimiters) and ' ' not in str(entry):
-                for delimiter in possible_delimiters:
-                    for part in str(entry).split(delimiter):
-                        if part.isnumeric():
-                            contains_number = True
-                        else:
-                            contains_string = True
-                # code is (most likely) the first number in the entry
-                if delimiter in str(entry) and contains_string and contains_number:
-                    code_idx = [x for x in str(entry).split(delimiter) if x.isnumeric()][0]
-            # forth case: entries are separated by a delimiter, with whitespaces inbetween
-            elif any(delimiter in str(entry) for delimiter in possible_delimiters) and ' ' in str(entry):
-                fully_split = []
-                # first split by whitespaces
-                for part in str(entry).split():
-                    if any(delimiter in str(entry) for delimiter in possible_delimiters):
-                        fully_split.extend(part)
-                    # then split by delimiters
-                    else:
-                        for delimiter in possible_delimiters:
-                            if delimiter in part:
-                                fully_split.extend(part.split(delimiter))
-                for part in fully_split:
-                    if part.isnumeric():
-                        contains_number = True
-                    else:
-                        contains_string = True
-                if contains_string and contains_number:
-                    code_idx = [x for x in fully_split if x.isnumeric()][0]
-            # check if the code is contained in the data of this column
-            if code_idx is not None and contains_number and contains_string and int(code_idx) in df[column]:
+            # second case: cell is not an encoding cell
+            if get_encoding(str(entry)) is None:
+                continue
+            # third case: cell is an encoding cell
+            key, value = get_encoding(str(entry))
+            # check if the key is also contained in the data of this column
+            if key is not None and value is not None and int(value) in df[column]:
                 is_header_matrix.at[row_idx, column] = True
     return is_header_matrix
 
@@ -105,10 +92,13 @@ def identify_descriptive_header_rows(df: DataFrame, error_tolerance: float = 0.1
     :return: Row indices of rows that are likely to contain an encoding scheme
     """
     bool_headers_df = identify_descriptive_header_cells(df)
-    # ignore empty entries since not all columns have the same number of encodings
-    bool_headers_df.replace(np.nan, True, inplace=True)
-    return [row for row in bool_headers_df.index if
-            bool_headers_df.loc[row].sum() > (1 - error_tolerance) * len(df.columns)]
+    row_indices = []
+    for idx, row in enumerate(bool_headers_df.index):
+        # check for rows containing encoding cells
+        if bool_headers_df.loc[row].any():
+            if (bool_headers_df.iloc[idx] == False).sum() / df.shape[1] < error_tolerance:
+                row_indices.append(idx)
+    return row_indices
 
 
 def encode_dataframe(df: DataFrame, encoding_schemes: dict) -> DataFrame:
@@ -121,7 +111,5 @@ def encode_dataframe(df: DataFrame, encoding_schemes: dict) -> DataFrame:
     encoded_df = df.copy()
     for column in df:
         if column in encoding_schemes:
-            encoded_df[column].replace(encoding_schemes[column], inplace=True)
-            # everything else that can't be matched to a number or the scheme should be NaN
-            encoded_df[column].replace(to_replace=r'[^0-9]', value=np.nan, regex=True, inplace=True)
+            encoded_df[column] = encoded_df[column].replace(encoding_schemes[column])
     return encoded_df
