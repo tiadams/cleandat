@@ -1,5 +1,9 @@
+import re
 import numpy as np
+import pandas as pd
 from pandas import DataFrame
+
+from clinical_etl_toolbox.constants import MISSING_DATA_TOKENS
 
 
 def clean_unknown_entries(df: DataFrame) -> DataFrame:
@@ -9,7 +13,7 @@ def clean_unknown_entries(df: DataFrame) -> DataFrame:
     :return: A dataframe
     """
     #  if it is not known, it should be either empty or nan
-    tokens = ['?', 'unknown']
+    tokens = MISSING_DATA_TOKENS
     df.replace(tokens, np.nan, inplace=True)
     return df
 
@@ -23,33 +27,30 @@ def drop_rows(df: DataFrame, row_indices: list[int]) -> DataFrame:
     :param df: DataFrame: Specify the dataframe that will be passed into the function
     :param row_indices: list[int]: Specify the indices of rows to be dropped
     :return: A dataframe
-    :doc-author: Trelent
     """
     df.drop(row_indices, axis=0, inplace=True)
     return df
 
 
-def drop_empty_rows(df):
+def drop_empty_rows(df: DataFrame) -> DataFrame:
     """
     The drop_empty_rows function takes a dataframe as input and drops all rows that are empty.
         It returns the modified dataframe.
 
     :param df: Pass in the dataframe that we want to drop empty rows from
     :return: The dataframe with rows that are empty
-    :doc-author: Trelent
     """
     df.dropna(axis=0, how='all', inplace=True)
     return df
 
 
-def drop_empty_columns(df):
+def drop_empty_columns(df: DataFrame) -> DataFrame:
     """
     The drop_empty_columns function takes a dataframe as an argument and returns the same dataframe with any columns that
     are entirely empty (i.e., contain only NaN values) removed.
 
     :param df: Pass in the dataframe that we want to drop columns from
     :return: A dataframe with all columns that are empty dropped
-    :doc-author: Trelent
     """
     for columns in df:
         if df[columns].isnull().all():
@@ -57,7 +58,7 @@ def drop_empty_columns(df):
     return df
 
 
-def remove_entries_with_inconsistent_datatypes(df, threshold=0.1):
+def remove_entries_with_inconsistent_datatypes(df: DataFrame, threshold: float = 0.1) -> DataFrame:
     """ Removes entries that seem inconsistent with the rest of the column (e.g. string values in columns containing
     >90% numbers) and replace them with NaN.
 
@@ -65,15 +66,88 @@ def remove_entries_with_inconsistent_datatypes(df, threshold=0.1):
     :param df: The dataframe to be cleaned
     :param threshold: This threshold defines the minimum percentage of entries that need to be inconsistent to be
     dropped from the dataframe
-    :return:
+    :return: The cleaned dataframe
     """
     for column in df:
         if df[column].dtype == 'object':
+
+            # calculate the percentage of numeric entries in the column
             percentage_numeric = sum([str(entry).isnumeric() for entry in df[column]]) / len(df[column])
+
             # numeric entries which are smaller than the threshold are considered inconsistent
             if percentage_numeric < threshold:
                 df[column] = df[column].apply(lambda x: np.nan if str(x).isnumeric() else x)
+
             # string entries which are smaller than the threshold are considered inconsistent
             if 1 - percentage_numeric < threshold:
                 df[column] = df[column].apply(lambda x: np.nan if not str(x).isnumeric() else x)
+
     return df
+
+
+def unify_number_format(df: DataFrame) -> DataFrame:
+    """Unify the number format of all entries in the dataframe.
+
+    Data may be presented in different formats, e.g. in scientific notation (3.453 * 10^-4).
+    This function unifies the format to a simple decimal number.
+
+    :param df: The dataframe to be cleaned
+    :return: The cleaned dataframe
+    """
+    for column in df:
+
+        # replace all entries that contain a comma with a dot
+        df[column] = df[column].replace(',', '.', regex=True)
+
+        # replace scientific notation string with machine-readable notation
+        # first: replace unicode superscript numbers with regular integers (e.g. ⁴ -> ^4)
+        df[column] = df[column].apply(lambda x: replace_unicode_superscript_numbers(x) if pd.notna(x) else x)
+        # second: replace the scientific notation with machine-readable notation
+        df[column] = df[column].replace('10\s*\^', 'e+0', regex=True)
+
+        # multiplication signs (either x or *) can be replaced with a whitespace
+        df[column] = df[column].replace('\s?[\*x]\s?', ' ', regex=True)
+
+        # dashes most likely imply ranges, e.g. when something can't be measured precisely -> take average instead
+        df[column] = df[column].apply(lambda x: replace_range_with_average(x) if pd.notna(x) else x)
+
+    return df
+
+
+def replace_range_with_average(input_string):
+    """ Takes a string as input and returns the average of the lower and upper bounds of the range
+
+    :param input_string: The input string
+    :return: The average of the lower and upper bounds of the range if the input string matches the pattern, #
+    else the input string
+    """
+    if pd.notna(input_string):
+        # Define a regular expression pattern to match the range format (e.g., 1-2 or 0.5-1.7)
+        pattern = r"(\d+(\.\d+)?)-(\d+(\.\d+)?)"
+
+        # Find all occurrences of the pattern in the input_string
+        matches = re.findall(pattern, str(input_string))
+
+        if matches:
+            # Calculate the average of the lower and upper bounds of the range
+            lower_bound = float(matches[0][0])
+            upper_bound = float(matches[0][2])
+            average = (lower_bound + upper_bound) / 2
+
+            # Replace the matched range with the calculated average
+            return re.sub(pattern, str(average), input_string)
+
+    return input_string
+
+
+def replace_unicode_superscript_numbers(input_string):
+    """
+    The replace_unicode_superscript_numbers function takes a string as input and returns the same string with any
+    unicode superscript numbers replaced by their equivalent LaTeX code. For example, it will replace ² with ^2.
+
+    :param input_string: Store the string that is passed into the function
+    :return: A string with unicode superscript numbers replaced by
+    """
+    for sup, num in zip("⁰¹²³⁴⁵⁶⁷⁸⁹", "0123456789"):
+        input_string = str(input_string).replace(sup, "^" + num)
+    return input_string

@@ -27,6 +27,10 @@ def get_encoding(string: str) -> (str, int):
                 value = value.strip()
                 if key.isnumeric() and isinstance(value, str):
                     return value, int(key)
+                # in case the order is swapped, e.g. m=1 instead of 1=m
+                if value.isnumeric() and isinstance(key, str):
+                    return key, int(value)
+
     else:
         return None
 
