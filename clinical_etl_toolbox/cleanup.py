@@ -111,6 +111,9 @@ def unify_number_format(df: DataFrame) -> DataFrame:
         # dashes most likely imply ranges, e.g. when something can't be measured precisely -> take average instead
         df[column] = df[column].apply(lambda x: replace_range_with_average(x) if pd.notna(x) else x)
 
+        # replace exponential notation with float
+        df[column] = df[column].apply(lambda x: convert_exponential_to_float(x.replace(" ", "")) if pd.notna(x) else x)
+
     return df
 
 
@@ -151,3 +154,25 @@ def replace_unicode_superscript_numbers(input_string):
     for sup, num in zip("⁰¹²³⁴⁵⁶⁷⁸⁹", "0123456789"):
         input_string = str(input_string).replace(sup, "^" + num)
     return input_string
+
+
+def convert_exponential_to_float(value):
+    """Converts a string containing an exponential notation to a float.
+
+    :param value: Store the value of each cell in the dataframe
+    :return: A float, or the original value if it can't be converted to a float
+    :doc-author: Trelent
+    """
+    # Check if the value is a string containing an exponential notation
+    if isinstance(value, str) and 'e' in value.lower():
+        try:
+            # Convert exponential notation to float
+            return float(value)
+        except ValueError:
+            # If the conversion fails, keep the original value
+            return value
+    # Check if the value is NaN
+    elif pd.isna(value):
+        return np.nan
+    else:
+        return value

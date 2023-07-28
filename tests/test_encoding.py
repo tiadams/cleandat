@@ -63,8 +63,6 @@ class Test(TestCase):
     def test_encode_dataframe(self):
         encoding_scheme = {'sex': {'m': 1, 'f': 2}, 'categories': {'foo': 1, 'bar': 2, 'foobar': 3}}
         df_encoded = encode_dataframe(self.df, encoding_scheme)
-        counts_sex = df_encoded['sex'].value_counts()
-        counts_categories = df_encoded['categories'].value_counts()
         self.assertEqual(1, (df_encoded['sex'][27]))
         self.assertEqual(1, (df_encoded['sex'][28]))
         self.assertEqual(2, df_encoded['categories'][17])

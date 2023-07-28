@@ -1,6 +1,7 @@
 import os
 from unittest import TestCase
 
+import numpy as np
 import pandas as pd
 
 from clinical_etl_toolbox.cleanup import unify_number_format
@@ -14,4 +15,4 @@ class Test(TestCase):
 
     def test_unify_number_format(self):
         df_clean = unify_number_format(self.df)
-        test = str("10^8").isnumeric()
+        self.assertEqual(1500000, np.average(df_clean['cell_count'][9:16]))
