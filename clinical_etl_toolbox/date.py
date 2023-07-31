@@ -50,10 +50,10 @@ def clean_date_entries(df: DataFrame, date_columns: list[str], date_order: str =
             if not pd.isnull(entry):
                 date = dateparser.parse(str(entry), settings={'DATE_ORDER': date_order})
                 if date is not None:
-                    df.at[col, idx] = date
+                    df.loc[idx, col] = date
                 else:
                     if replace_unparsable:
-                        df.at[col, idx] = np.nan
+                        df.loc[idx, col] = np.nan
     return df
 
 
