@@ -4,7 +4,7 @@ from unittest import TestCase
 
 import pandas as pd
 
-from date import identify_date_columns, clean_date_entries, decompose_date_entries
+from clinical_etl_toolbox.date import identify_date_columns, clean_date_entries, decompose_date_entries
 
 
 class Test(TestCase):
