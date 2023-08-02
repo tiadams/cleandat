@@ -6,4 +6,10 @@ Major functionalities include heuristic based data cleaning and feature engineer
 - Automatic detection of date strings of different formats (e.g. 2019-01-01, 01/01/2019, January 2022) and conversion to a unified format
 - Encoding of date strings into decomposed date features (e.g. year, month, day, weekday, etc.)
 - Heuristics for unification of different number formats, e.g. 1,000.00 vs. 1.000,00 or exponential notations like 1e3 vs 10x10^2
-- Detection and replacement of inconsistent data values 
+- Detection and replacement of inconsistent data values
+
+# Setup
+
+Install via pip:
+
+    pip install cleandat
