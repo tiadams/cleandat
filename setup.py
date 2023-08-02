@@ -8,5 +8,5 @@ setup(
     license='MIT License',
     author='Tim Adams',
     author_email='tim-adams@gmx.net',
-    description='Python functions to facilitate the pre-processing of data for ML tasks in a clinical context '
+    description='Python functions to facilitate the pre-processing of data for ML tasks in a clinical context.',
 )
