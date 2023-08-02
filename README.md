@@ -1,4 +1,4 @@
-# Clinical Data Pre-Processing Toolbox
+# CleanDat
 Python functions to facilitate the pre-processing of data to prepare them for ML tasks, especially suitable for data in a clinical context.
 
 Major functionalities include heuristic based data cleaning and feature engineering like:
