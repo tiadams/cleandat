@@ -16,7 +16,7 @@ PID,sex,birth_date,empty_column,freetext,categories,cell_count
 6,1,8.7.2020,,utilized,bar,1.5 *10^6
 7,2,Oktober 1990,,correctly,foobar,1.5*10⁶
 8,1,1981,,here,?,1-2x10^6
-9,,12.4.2020,,since,bar,
+9,,12.4.2020,,since,bar,"0,4-2x10^8"
 10,1,13.3.1989,,they,1,
 11,other,"43,12.5678",,are,bar,
 12,1,5.4.1975,,only,2,

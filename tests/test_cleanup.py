@@ -17,6 +17,7 @@ class Test(TestCase):
     def test_unify_number_format(self):
         df_clean = unify_number_format(self.df)
         self.assertEqual(1500000, np.average(df_clean['cell_count'][9:16]))
+        self.assertEqual(120000000, df_clean['cell_count'][17])
 
     def test_clean_unknown_entries(self):
         df_clean = clean_unknown_entries(self.df)
