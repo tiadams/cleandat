@@ -4,7 +4,7 @@ from unittest import TestCase
 import numpy as np
 import pandas as pd
 
-from clinical_etl_toolbox.cleanup import unify_number_format, clean_unknown_entries, \
+from cleandat.cleanup import unify_number_format, clean_unknown_entries, \
     remove_entries_with_inconsistent_datatypes
 
 

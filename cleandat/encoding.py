@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from pandas import DataFrame
 
-from clinical_etl_toolbox import constants
+from cleandat import constants
 
 
 def get_encoding(string: str) -> (str, int):

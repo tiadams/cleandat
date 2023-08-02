@@ -1,10 +1,10 @@
 from pandas import DataFrame
 
-from clinical_etl_toolbox.cleanup import drop_rows, drop_empty_columns, drop_empty_rows, clean_unknown_entries, \
+from cleandat.cleanup import drop_rows, drop_empty_columns, drop_empty_rows, clean_unknown_entries, \
     remove_entries_with_inconsistent_datatypes, unify_number_format
-from clinical_etl_toolbox.encoding import get_column_encoding_schemes, encode_dataframe, \
+from cleandat.encoding import get_column_encoding_schemes, encode_dataframe, \
     identify_descriptive_header_rows
-from clinical_etl_toolbox.date import identify_date_columns, clean_date_entries, decompose_date_entries
+from cleandat.date import identify_date_columns, clean_date_entries, decompose_date_entries
 
 
 def find_encodings_and_encode_strings(df: DataFrame, drop_encoding_rows: bool = True) -> DataFrame:

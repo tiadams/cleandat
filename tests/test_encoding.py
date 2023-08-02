@@ -3,7 +3,7 @@ from unittest import TestCase
 
 import pandas as pd
 
-from clinical_etl_toolbox.encoding import get_encoding, identify_descriptive_header_cells, \
+from cleandat.encoding import get_encoding, identify_descriptive_header_cells, \
     identify_descriptive_header_rows, get_column_encoding_schemes, encode_dataframe
 
 

@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from pandas import DataFrame
 
-from clinical_etl_toolbox.constants import MISSING_DATA_TOKENS
+from cleandat.constants import MISSING_DATA_TOKENS
 
 
 def clean_unknown_entries(df: DataFrame) -> DataFrame:
