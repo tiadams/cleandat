@@ -4,7 +4,7 @@ from unittest import TestCase
 
 import pandas as pd
 
-from cleandat.date import identify_date_columns, clean_date_entries, decompose_date_entries
+from cleandat.date import identify_date_columns, normalize_date_entries, decompose_date_entries
 
 
 class Test(TestCase):
@@ -18,7 +18,7 @@ class Test(TestCase):
         self.assertListEqual(['birth_date'], date_columns)
 
     def test_clean_date_entries(self):
-        df_cleaned = clean_date_entries(self.df, ['birth_date'])
+        df_cleaned = normalize_date_entries(self.df, ['birth_date'])
         self.assertEqual(pd.isna(df_cleaned['birth_date'])[10], True)
         self.assertEqual(df_cleaned['birth_date'][9], datetime(2020, 4, 12, 0, 0))
         self.assertEqual(df_cleaned['birth_date'][11], datetime(2021, 6, 4, 0, 0))

@@ -32,14 +32,14 @@ def identify_date_columns(df: DataFrame, threshold: float = 0.5) -> list:
     return date_columns
 
 
-def clean_date_entries(df: DataFrame, date_columns: list[str], date_order: str = 'DMY',
-                       replace_unparsable=True) -> DataFrame:
+def normalize_date_entries(df: DataFrame, date_columns: list[str], date_order: str = 'DMY',
+                           remove_unparsable=True) -> DataFrame:
     """Replace all date entries with a uniform format.
 
     Reformat all date entries to a uniform format - dates may be written in different formats,
     e.g. 01.01.2020 or January 1st, 2020
 
-    :param replace_unparsable: If True, replace entries that cannot be parsed as dates with NaN
+    :param remove_unparsable: If True, replace entries that cannot be parsed as dates with NaN
     :param date_order: The order of the date entries, e.g. DMY for 01.01.2020 or MDY for January 1st, 2020
     :param df: The dataframe to be reformatted
     :param date_columns: List of column names containing date entries
@@ -52,7 +52,7 @@ def clean_date_entries(df: DataFrame, date_columns: list[str], date_order: str =
                 if date is not None:
                     df.loc[idx, col] = date
                 else:
-                    if replace_unparsable:
+                    if remove_unparsable:
                         df.loc[idx, col] = np.nan
     return df
 
