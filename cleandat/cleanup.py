@@ -64,8 +64,9 @@ def remove_entries_with_inconsistent_datatypes(df: DataFrame, threshold: float =
 
     Only execute this after fully encoding the data / finishing all previous cleaning steps.
     :param df: The dataframe to be cleaned
-    :param threshold: This threshold defines the minimum percentage of entries that need to be inconsistent to be
-    dropped from the dataframe
+    :param threshold: The threshold for the ratio of non-allowed inconsistent entries in a column, default 0.1 - meaning
+    when more than 10% of the entries in a column are inconsistent (e.g. containing string instead of int), they get
+    removed
     :return: The cleaned dataframe
     """
     for column in df:
