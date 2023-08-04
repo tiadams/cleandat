@@ -46,14 +46,9 @@ def normalize_date_entries(df: DataFrame, date_columns: list[str], date_order: s
     :return: The reformatted dataframe
     """
     for col in date_columns:
-        for idx, entry in enumerate(df[col]):
-            if not pd.isnull(entry):
-                date = dateparser.parse(str(entry), settings={'DATE_ORDER': date_order})
-                if date is not None:
-                    df.loc[idx, col] = date
-                else:
-                    if remove_unparsable:
-                        df.loc[idx, col] = np.nan
+        df[col] = df[col].apply(lambda x: dateparser.parse(str(x), settings={'DATE_ORDER': date_order})
+        if not pd.isnull(x) and dateparser.parse(str(x), settings={'DATE_ORDER': date_order}) is not None else np.nan
+        if remove_unparsable else x)
     return df
 
 
