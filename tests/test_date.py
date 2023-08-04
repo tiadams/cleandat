@@ -14,11 +14,12 @@ class Test(TestCase):
     df = pd.read_csv(os.path.join(TEST_DIR_PATH, "resources", 'test.csv'))
 
     def test_identify_date_columns(self):
-        date_columns = identify_date_columns(self.df)
-        self.assertListEqual(['birth_date'], date_columns)
+        date_columns = identify_date_columns(self.df.copy())
+        self.assertEqual(len(date_columns), 1)
+        self.assertEqual(date_columns[0], 'birth_date')
 
     def test_clean_date_entries(self):
-        df_cleaned = normalize_date_entries(self.df, ['birth_date'])
+        df_cleaned = normalize_date_entries(self.df.copy(), ['birth_date'])
         self.assertEqual(pd.isna(df_cleaned['birth_date'])[10], True)
         self.assertEqual(df_cleaned['birth_date'][9], datetime(2020, 4, 12, 0, 0))
         self.assertEqual(df_cleaned['birth_date'][11], datetime(2021, 6, 4, 0, 0))
