@@ -3,14 +3,14 @@ from typing import Callable
 
 from pandas import DataFrame
 
-from cleandat.ChangedEntry import ChangedEntry
+from cleandat.changelog import ChangedEntry, ChangeLog
 
 
 class TransformationPipeline:
 
     def __init__(self, df: DataFrame):
         self.steps: list[Callable[[DataFrame, list[str]], DataFrame]] = []
-        self.changelog: list[ChangedEntry] = []
+        self.changelog: ChangeLog = ChangeLog()
         self.data: DataFrame = df
 
     def add_task(self, task: Callable[[DataFrame, list[str]], DataFrame], columns: list[str] = None):
@@ -33,8 +33,7 @@ class TransformationPipeline:
                 value_after = str(diff[column].loc[row_idx, 'other'])
                 function_name = transformation_step.__name__
                 log_entry = ChangedEntry(function_name, column, row_idx, value_before, value_after)
-                self.changelog.append(log_entry)
+                self.changelog.add_entry(log_entry)
 
     def print_changelog(self):
-        for entry in self.changelog:
-            print(f'[{entry.id}] {entry.applied_function}: {entry.column}[{entry.row_index}] | {entry.value_before} -> {entry.value_after}')
+        return self.changelog.pretty_print()

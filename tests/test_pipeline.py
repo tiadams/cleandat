@@ -3,7 +3,7 @@ from unittest import TestCase
 
 import pandas as pd
 
-from cleandat.TransformationPipeline import TransformationPipeline
+from cleandat.pipeline import TransformationPipeline
 from cleandat.date import normalize_date_entries
 
 
