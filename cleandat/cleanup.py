@@ -46,8 +46,8 @@ def drop_empty_rows(df: DataFrame) -> DataFrame:
 
 def drop_empty_columns(df: DataFrame) -> DataFrame:
     """
-    The drop_empty_columns function takes a dataframe as an argument and returns the same dataframe with any columns that
-    are entirely empty (i.e., contain only NaN values) removed.
+    The drop_empty_columns function takes a dataframe as an argument and returns the same dataframe with any columns
+    that are entirely empty (i.e., contain only NaN values) removed.
 
     :param df: Pass in the dataframe that we want to drop columns from
     :return: A dataframe with all columns that are empty dropped
@@ -96,7 +96,6 @@ def unify_number_format(df: DataFrame) -> DataFrame:
     :return: The cleaned dataframe
     """
     for column in df:
-
         # replace all entries that contain a comma with a dot
         df[column] = df[column].replace(',', '.', regex=True)
 
@@ -118,7 +117,7 @@ def unify_number_format(df: DataFrame) -> DataFrame:
     return df
 
 
-def replace_range_with_average(input_string):
+def replace_range_with_average(input_string: str) -> str:
     """ Takes a string as input and returns the average of the lower and upper bounds of the range
 
     :param input_string: The input string
@@ -144,7 +143,7 @@ def replace_range_with_average(input_string):
     return input_string
 
 
-def replace_unicode_superscript_numbers(input_string):
+def replace_unicode_superscript_numbers(input_string: str) -> str:
     """
     The replace_unicode_superscript_numbers function takes a string as input and returns the same string with any
     unicode superscript numbers replaced by their equivalent LaTeX code. For example, it will replace ² with ^2.
@@ -157,7 +156,7 @@ def replace_unicode_superscript_numbers(input_string):
     return input_string
 
 
-def convert_exponential_to_float(value):
+def convert_exponential_to_float(value: str) -> float | np.nan:
     """Converts a string containing an exponential notation to a float.
 
     :param value: Store the value of each cell in the dataframe
