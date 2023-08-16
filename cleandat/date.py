@@ -32,6 +32,22 @@ def identify_date_columns(df: DataFrame, threshold: float = 0.5) -> list:
     return date_columns
 
 
+def create_durational_column(df: DataFrame, date_col_start: str, date_col_end: str, new_col_name: str, remove_dates: bool = True) -> DataFrame:
+    """Creates a new column containing the duration between two date columns in days.
+
+    :param df: The dataframe to which the column should be added
+    :param date_col_start: The column containing the start date
+    :param date_col_end: The column containing the end date
+    :param new_col_name: The name of the new column
+    :param remove_dates: If True, remove the date columns after the new column has been created
+    :return: The dataframe with the new column
+    """
+    df[new_col_name] = (df[date_col_end] - df[date_col_start]).dt.days
+    if remove_dates:
+        df.drop([date_col_start, date_col_end], axis=1, inplace=True)
+    return df
+
+
 def normalize_date_entries(df: DataFrame, date_columns: list[str], date_order: str = 'DMY',
                            remove_unparsable=True) -> DataFrame:
     """Replace all date entries with a uniform format.
