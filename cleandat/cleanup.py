@@ -156,7 +156,7 @@ def replace_unicode_superscript_numbers(input_string: str) -> str:
     return input_string
 
 
-def convert_exponential_to_float(value: str) -> float | np.nan:
+def convert_exponential_to_float(value: str) -> float:
     """Converts a string containing an exponential notation to a float.
 
     :param value: Store the value of each cell in the dataframe

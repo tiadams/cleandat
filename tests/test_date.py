@@ -4,7 +4,8 @@ from unittest import TestCase
 
 import pandas as pd
 
-from cleandat.date import identify_date_columns, normalize_date_entries, decompose_date_entries
+from cleandat.date import identify_date_columns, normalize_date_entries, decompose_date_entries, \
+    create_durational_column
 
 
 class Test(TestCase):
