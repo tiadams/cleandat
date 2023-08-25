@@ -72,8 +72,11 @@ def remove_entries_with_inconsistent_datatypes(df: DataFrame, threshold: float =
     for column in df:
         if df[column].dtype == 'object':
 
+            # exclude nan entries from the calculation
+            number_nan = sum([pd.isna(entry) for entry in df[column]])
+
             # calculate the percentage of numeric entries in the column
-            percentage_numeric = sum([str(entry).isnumeric() for entry in df[column]]) / len(df[column])
+            percentage_numeric = sum([str(entry).isnumeric() for entry in df[column]]) / (len(df[column]) - number_nan)
 
             # numeric entries which are smaller than the threshold are considered inconsistent
             if percentage_numeric < threshold:
