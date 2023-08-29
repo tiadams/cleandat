@@ -15,7 +15,7 @@ except FileNotFoundError:
 
 setup(
     name='cleandat',
-    version='0.0.1',
+    version='0.0.2',
     packages=['tests', 'cleandat'],
     url='https://github.com/tiadams/cleandat',
     license='MIT License',
