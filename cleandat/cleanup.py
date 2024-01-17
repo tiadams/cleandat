@@ -89,16 +89,20 @@ def remove_entries_with_inconsistent_datatypes(df: DataFrame, threshold: float =
     return df
 
 
-def unify_number_format(df: DataFrame) -> DataFrame:
+def unify_number_format(df: DataFrame, columns=None) -> DataFrame:
     """Unify the number format of all entries in the dataframe.
 
     Data may be presented in different formats, e.g. in scientific notation (3.453 * 10^-4).
     This function unifies the format to a simple decimal number.
 
     :param df: The dataframe to be cleaned
+    :param columns: List of columns to be cleaned. Will apply to all columns if None (default).
     :return: The cleaned dataframe
     """
-    for column in df:
+    selected_columns = df.columns
+    if columns is not None:
+        selected_columns = columns
+    for column in selected_columns:
         # replace all entries that contain a comma with a dot
         df[column] = df[column].replace(',', '.', regex=True)
 

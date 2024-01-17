@@ -19,6 +19,13 @@ class Test(TestCase):
         self.assertEqual(1500000, np.average(df_clean['cell_count'][9:16]))
         self.assertEqual(120000000, df_clean['cell_count'][17])
 
+    def test_unify_number_format_only_specific_columns(self):
+        df_clean = unify_number_format(self.df, columns=["cell_count"])
+        self.assertEqual(1500000, np.average(df_clean['cell_count'][9:16]))
+        self.assertEqual(120000000, df_clean['cell_count'][17])
+        # date column remains intact
+        self.assertEqual(df_clean["birth_date"][25], "01-02-1987")
+
     def test_clean_unknown_entries(self):
         df_clean = clean_unknown_entries(self.df)
         self.assertEqual(pd.isna(df_clean['birth_date'])[13], True)
